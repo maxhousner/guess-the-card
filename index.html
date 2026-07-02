@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f3d2e" />
+  <meta name="description" content="Guess the Card — a simple deck to flip through with friends." />
+  <title>Guess the Card</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230f3d2e'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='%23e9c46a'>&#9824;</text></svg>" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Guess the Card</div>
+    <div class="controls">
+      <button id="toggleProgress" class="icon-btn" type="button" aria-pressed="true" title="Show/hide counter" aria-label="Show or hide the card counter"></button>
+      <button id="shuffleTop" class="btn-shuffle" type="button" aria-label="Shuffle the deck">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+        <span>Shuffle</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="card-wrap">
+      <div id="card" class="card" role="button" tabindex="0" aria-label="Playing card. Tap or press space to reveal the next card."></div>
+    </div>
+    <div class="below">
+      <div id="progress" class="progress" aria-live="polite">1 / 52</div>
+      <div id="hint" class="hint">Tap or swipe for the next card</div>
+    </div>
+  </main>
+
+  <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overlayTitle">
+    <div class="modal">
+      <h2 id="overlayTitle">Deck complete!</h2>
+      <p>You&rsquo;ve gone through all 52 cards.</p>
+      <button id="reshuffleBtn" class="primary" type="button">Shuffle</button>
+      <button id="continueBtn" class="secondary" type="button">Continue in same order</button>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
