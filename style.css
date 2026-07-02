@@ -62,7 +62,7 @@ body {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 button {
@@ -85,6 +85,33 @@ button {
 }
 .icon-btn[aria-pressed="false"] { opacity: 0.55; }
 .icon-btn:active { background: rgba(255, 255, 255, 0.16); }
+
+/* Hard Mode toggle: compact icon on phones, labeled on wider screens */
+.toggle-hard {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 11px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.toggle-hard span { display: none; }
+.toggle-hard[aria-pressed="true"] {
+  background: linear-gradient(#e8564a, #d23f33);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(210, 63, 51, 0.4);
+}
+@media (min-width: 480px) {
+  .toggle-hard span { display: inline; }
+}
 
 .btn-shuffle {
   display: inline-flex;
@@ -218,7 +245,7 @@ button {
 /* Face cards */
 .face-frame {
   position: absolute;
-  inset: 11% 13%;
+  inset: 13% 18%;
   border: 2px solid currentColor;
   border-radius: 6cqw;
   opacity: 0.16;
@@ -323,4 +350,9 @@ button {
 /* ---------- Larger screens ---------- */
 @media (min-width: 700px) {
   .hint { font-size: 13px; }
+}
+
+/* Drop the title on very narrow phones so the controls always fit */
+@media (max-width: 360px) {
+  .brand { display: none; }
 }

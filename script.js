@@ -100,6 +100,8 @@
   var progressOn = true;
   var overlayOpen = false;
   var hintDismissed = false;
+  var hardMode = false;
+  var hardCount = 0;
 
   /* ---------- Elements ---------- */
   var cardEl = document.getElementById('card');
@@ -107,14 +109,28 @@
   var hintEl = document.getElementById('hint');
   var overlayEl = document.getElementById('overlay');
   var toggleBtn = document.getElementById('toggleProgress');
+  var toggleHardBtn = document.getElementById('toggleHard');
   var shuffleTopBtn = document.getElementById('shuffleTop');
   var reshuffleBtn = document.getElementById('reshuffleBtn');
   var continueBtn = document.getElementById('continueBtn');
 
   /* ---------- Core actions ---------- */
-  function render() {
-    cardEl.innerHTML = cardFaceHTML(order[index]);
-    progressEl.textContent = (index + 1) + ' / 52';
+  function drawHardCard() {
+    // Hard Mode: a fresh random card from the full 52 — repeats allowed.
+    return order[Math.floor(Math.random() * order.length)];
+  }
+
+  function updateProgress() {
+    if (hardMode) {
+      progressEl.textContent = hardCount + (hardCount === 1 ? ' card' : ' cards');
+    } else {
+      progressEl.textContent = (index + 1) + ' / 52';
+    }
+  }
+
+  function showCard(card) {
+    cardEl.innerHTML = cardFaceHTML(card);
+    updateProgress();
   }
 
   function dismissHint() {
@@ -126,12 +142,18 @@
   function advance() {
     if (overlayOpen) return;
     dismissHint();
+    if (hardMode) {
+      // Reshuffle-every-draw: endless stream of random cards, repeats allowed.
+      hardCount++;
+      showCard(drawHardCard());
+      return;
+    }
     if (index >= order.length - 1) {
       openOverlay();
       return;
     }
     index++;
-    render();
+    showCard(order[index]);
   }
 
   function openOverlay() {
@@ -145,15 +167,42 @@
 
   function reshuffle() {
     shuffle(order);
-    index = 0;
     closeOverlay();
-    render();
+    dismissHint();
+    if (hardMode) {
+      hardCount = 1;
+      showCard(drawHardCard());
+    } else {
+      index = 0;
+      showCard(order[index]);
+    }
   }
 
   function continueSame() {
-    index = 0;
     closeOverlay();
-    render();
+    index = 0;
+    showCard(order[index]);
+  }
+
+  function setHardMode(on) {
+    hardMode = on;
+    toggleHardBtn.setAttribute('aria-pressed', String(on));
+    closeOverlay();
+    dismissHint();
+    if (on) {
+      // Start a fresh Hard Mode run with a random card.
+      hardCount = 1;
+      showCard(drawHardCard());
+    } else {
+      // Back to a normal shuffled pass from card 1.
+      shuffle(order);
+      index = 0;
+      showCard(order[index]);
+    }
+  }
+
+  function toggleHard() {
+    setHardMode(!hardMode);
   }
 
   function toggleProgress() {
@@ -203,10 +252,11 @@
   /* ---------- Button wiring ---------- */
   shuffleTopBtn.addEventListener('click', reshuffle);
   toggleBtn.addEventListener('click', toggleProgress);
+  toggleHardBtn.addEventListener('click', toggleHard);
   reshuffleBtn.addEventListener('click', reshuffle);
   continueBtn.addEventListener('click', continueSame);
 
   /* ---------- Init ---------- */
   toggleBtn.innerHTML = EYE;
-  render();
+  showCard(order[index]);
 })();
