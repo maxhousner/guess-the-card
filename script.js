@@ -88,6 +88,19 @@
     );
   }
 
+  // Decorative face-down back shown at the start of a freshly shuffled deck.
+  // Reuses .card-face so it inherits the card's size, radius, shadow and
+  // cardIn reveal animation.
+  function cardBackHTML() {
+    return (
+      '<div class="card-face card-back">' +
+        '<div class="back-pattern"></div>' +
+        '<div class="back-plaque">Guess<br>The<br>Card</div>' +
+        '<div class="back-credit">Created By Max</div>' +
+      '</div>'
+    );
+  }
+
   /* ---------- SVG icons ---------- */
   var EYE =
     '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -100,6 +113,7 @@
   var progressOn = true;
   var overlayOpen = false;
   var hintDismissed = false;
+  var faceDown = false;
   var hardMode = false;
   var hardCount = 0;
 
@@ -113,6 +127,17 @@
   var shuffleTopBtn = document.getElementById('shuffleTop');
   var reshuffleBtn = document.getElementById('reshuffleBtn');
   var continueBtn = document.getElementById('continueBtn');
+  var brandEl = document.querySelector('.brand');
+
+  /* ---------- Brand title fit ----------
+     Keep the "Guess The Card" title while it fits; hide it entirely (rather
+     than showing a truncated "Guess Th…") once there isn't room. */
+  function fitBrand() {
+    brandEl.classList.remove('brand-hidden');   // reveal so we can measure
+    if (brandEl.scrollWidth > brandEl.clientWidth + 1) {
+      brandEl.classList.add('brand-hidden');    // would truncate → hide it
+    }
+  }
 
   /* ---------- Core actions ---------- */
   function drawHardCard() {
@@ -129,7 +154,18 @@
   }
 
   function showCard(card) {
+    faceDown = false;
     cardEl.innerHTML = cardFaceHTML(card);
+    cardEl.setAttribute('aria-label', 'Playing card. Tap or press space to reveal the next card.');
+    updateProgress();
+  }
+
+  // Face-down back: the top card of a freshly shuffled deck. First advance
+  // reveals it rather than moving on.
+  function showBack() {
+    faceDown = true;
+    cardEl.innerHTML = cardBackHTML();
+    cardEl.setAttribute('aria-label', 'Card face down. Tap or press space to reveal the first card.');
     updateProgress();
   }
 
@@ -142,6 +178,16 @@
   function advance() {
     if (overlayOpen) return;
     dismissHint();
+    if (faceDown) {
+      // Reveal the first card without advancing.
+      if (hardMode) {
+        hardCount = 1;
+        showCard(drawHardCard());
+      } else {
+        showCard(order[index]);
+      }
+      return;
+    }
     if (hardMode) {
       // Reshuffle-every-draw: endless stream of random cards, repeats allowed.
       hardCount++;
@@ -169,13 +215,9 @@
     shuffle(order);
     closeOverlay();
     dismissHint();
-    if (hardMode) {
-      hardCount = 1;
-      showCard(drawHardCard());
-    } else {
-      index = 0;
-      showCard(order[index]);
-    }
+    index = 0;
+    if (hardMode) hardCount = 0;
+    showBack();
   }
 
   function continueSame() {
@@ -190,14 +232,14 @@
     closeOverlay();
     dismissHint();
     if (on) {
-      // Start a fresh Hard Mode run with a random card.
-      hardCount = 1;
-      showCard(drawHardCard());
+      // Start a fresh Hard Mode run, first card face down.
+      hardCount = 0;
+      showBack();
     } else {
-      // Back to a normal shuffled pass from card 1.
+      // Back to a normal shuffled pass, first card face down.
       shuffle(order);
       index = 0;
-      showCard(order[index]);
+      showBack();
     }
   }
 
@@ -258,5 +300,7 @@
 
   /* ---------- Init ---------- */
   toggleBtn.innerHTML = EYE;
-  showCard(order[index]);
+  showBack();
+  fitBrand();
+  window.addEventListener('resize', fitBrand);
 })();
