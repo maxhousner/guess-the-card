@@ -131,6 +131,8 @@ button {
 @media (min-width: 480px) {
   .toggle-hard span { display: inline; }
 }
+/* When the title is hidden (fitBrand) there is room to spell out "Hard". */
+.brand-hidden ~ .controls .toggle-hard span { display: inline; }
 
 .btn-shuffle {
   display: inline-flex;
