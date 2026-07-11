@@ -95,7 +95,7 @@
     return (
       '<div class="card-face card-back">' +
         '<div class="back-pattern"></div>' +
-        '<div class="back-plaque">Guess<br>The<br>Card</div>' +
+        '<div class="back-plaque">Guess<br>the<br>Card</div>' +
         '<div class="back-credit">Created By Max</div>' +
       '</div>'
     );
