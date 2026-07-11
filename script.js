@@ -130,7 +130,7 @@
   var brandEl = document.querySelector('.brand');
 
   /* ---------- Brand title fit ----------
-     Keep the "Guess The Card" title while it fits; hide it entirely (rather
+     Keep the "Guess the Card" title while it fits; hide it entirely (rather
      than showing a truncated "Guess Th…") once there isn't room. */
   function fitBrand() {
     brandEl.classList.remove('brand-hidden');   // reveal so we can measure
@@ -303,4 +303,6 @@
   showBack();
   fitBrand();
   window.addEventListener('resize', fitBrand);
+  window.addEventListener('orientationchange', fitBrand);
+  window.addEventListener('pageshow', fitBrand);
 })();

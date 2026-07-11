@@ -1,4 +1,4 @@
-# Guess The Card
+# Guess the Card
 
 A lightweight, static web app for flipping through a shuffled deck of cards with friends — no sign-in, no backend, no build step. Just plain HTML, CSS, and vanilla JavaScript.
 
