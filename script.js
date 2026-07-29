@@ -3,12 +3,15 @@
 
   /* ---------- Deck definition ---------- */
   var SUITS = [
-    { symbol: '♠', color: 'black' }, // spades
-    { symbol: '♥', color: 'red' },   // hearts
-    { symbol: '♦', color: 'red' },   // diamonds
-    { symbol: '♣', color: 'black' }  // clubs
+    { symbol: '♠', color: 'black', name: 'Spades' },
+    { symbol: '♥', color: 'red', name: 'Hearts' },
+    { symbol: '♦', color: 'red', name: 'Diamonds' },
+    { symbol: '♣', color: 'black', name: 'Clubs' }
   ];
   var RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+  // Spoken rank names for the card's accessible label; digits speak for themselves.
+  var RANK_NAMES = { A: 'Ace', J: 'Jack', Q: 'Queen', K: 'King' };
 
   // Pip column positions (percent of card width) and the vertical band pips live in.
   var X = { L: 27, C: 50, R: 73 };
@@ -51,6 +54,12 @@
   }
 
   /* ---------- Card rendering ---------- */
+  // The card's glyphs are hidden behind an aria-label on #card, so the label
+  // has to carry the rank and suit itself.
+  function cardName(card) {
+    return (RANK_NAMES[card.rank] || card.rank) + ' of ' + card.suit.name;
+  }
+
   function cardFaceHTML(card) {
     var sym = card.suit.symbol;
     var rank = card.rank;
@@ -127,17 +136,9 @@
   var shuffleTopBtn = document.getElementById('shuffleTop');
   var reshuffleBtn = document.getElementById('reshuffleBtn');
   var continueBtn = document.getElementById('continueBtn');
-  var brandEl = document.querySelector('.brand');
-
-  /* ---------- Brand title fit ----------
-     Keep the "Guess the Card" title while it fits; hide it entirely (rather
-     than showing a truncated "Guess Th…") once there isn't room. */
-  function fitBrand() {
-    brandEl.classList.remove('brand-hidden');   // reveal so we can measure
-    if (brandEl.scrollWidth > brandEl.clientWidth + 1) {
-      brandEl.classList.add('brand-hidden');    // would truncate → hide it
-    }
-  }
+  var overlayTextEl = document.getElementById('overlayText');
+  var topbarEl = document.querySelector('.topbar');
+  var stageEl = document.querySelector('.stage');
 
   /* ---------- Core actions ---------- */
   function drawHardCard() {
@@ -149,14 +150,15 @@
     if (hardMode) {
       progressEl.textContent = hardCount + (hardCount === 1 ? ' card' : ' cards');
     } else {
-      progressEl.textContent = (index + 1) + ' / 52';
+      // Nothing has been revealed yet while the deck is face down.
+      progressEl.textContent = (faceDown ? index : index + 1) + ' / ' + order.length;
     }
   }
 
   function showCard(card) {
     faceDown = false;
     cardEl.innerHTML = cardFaceHTML(card);
-    cardEl.setAttribute('aria-label', 'Playing card. Tap or press space to reveal the next card.');
+    cardEl.setAttribute('aria-label', cardName(card) + '. Tap or press space for the next card.');
     updateProgress();
   }
 
@@ -202,13 +204,24 @@
     showCard(order[index]);
   }
 
+  // aria-modal promises the rest of the page is out of reach, so make it so:
+  // inert the page behind the modal, move focus in, and hand it back on close.
   function openOverlay() {
     overlayOpen = true;
+    overlayTextEl.textContent = 'You’ve gone through all ' + order.length + ' cards.';
+    topbarEl.inert = true;
+    stageEl.inert = true;
     overlayEl.classList.remove('hidden');
+    requestAnimationFrame(function () { reshuffleBtn.focus(); });
   }
   function closeOverlay() {
+    var wasOpen = overlayOpen;
     overlayOpen = false;
     overlayEl.classList.add('hidden');
+    topbarEl.inert = false;
+    stageEl.inert = false;
+    // Only pull focus back if it was actually inside the modal.
+    if (wasOpen) cardEl.focus();
   }
 
   function reshuffle() {
@@ -291,6 +304,13 @@
 
   cardEl.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlayOpen) {
+      e.preventDefault();
+      continueSame();
+    }
+  });
+
   /* ---------- Button wiring ---------- */
   shuffleTopBtn.addEventListener('click', reshuffle);
   toggleBtn.addEventListener('click', toggleProgress);
@@ -301,8 +321,4 @@
   /* ---------- Init ---------- */
   toggleBtn.innerHTML = EYE;
   showBack();
-  fitBrand();
-  window.addEventListener('resize', fitBrand);
-  window.addEventListener('orientationchange', fitBrand);
-  window.addEventListener('pageshow', fitBrand);
 })();

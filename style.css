@@ -56,31 +56,12 @@ body::before {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-end;
   padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px;
   background: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0));
 }
 
-.brand {
-  flex: 0 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  font-size: clamp(15px, 4.2vw, 20px);
-  color: var(--gold-1);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-/* Set by fitBrand() when the title would otherwise truncate to an ellipsis. */
-.brand-hidden { display: none; }
-
 .controls {
-  flex-shrink: 0;
-  margin-left: auto;   /* stay right-justified even when the title is hidden */
   display: flex;
   align-items: center;
   gap: 8px;
@@ -107,7 +88,7 @@ button {
 .icon-btn[aria-pressed="false"] { opacity: 0.55; }
 .icon-btn:active { background: rgba(255, 255, 255, 0.16); }
 
-/* Hard Mode toggle: compact icon on phones, labeled on wider screens */
+/* Hard Mode toggle */
 .toggle-hard {
   display: inline-flex;
   align-items: center;
@@ -123,18 +104,12 @@ button {
   font-size: 14px;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.toggle-hard span { display: none; }
 .toggle-hard[aria-pressed="true"] {
   background: linear-gradient(#e8564a, #d23f33);
   border-color: rgba(0, 0, 0, 0.15);
   color: #fff;
   box-shadow: 0 3px 12px rgba(210, 63, 51, 0.4);
 }
-@media (min-width: 480px) {
-  .toggle-hard span { display: inline; }
-}
-/* When the title is hidden (fitBrand) there is room to spell out "Hard". */
-.brand-hidden ~ .controls .toggle-hard span { display: inline; }
 
 .btn-shuffle {
   display: inline-flex;
@@ -350,11 +325,17 @@ button {
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   opacity: 1;
-  transition: opacity 0.2s ease;
+  /* Opening: visibility flips in at once, so the modal is focusable right away. */
+  transition: opacity 0.2s ease, visibility 0s;
 }
+/* visibility, not just opacity: a transparent overlay would otherwise keep the
+   modal buttons in the tab order and the accessibility tree. Closing delays it
+   by the fade duration so the overlay stays painted while it fades out. */
 .overlay.hidden {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0s 0.2s;
 }
 
 .modal {
