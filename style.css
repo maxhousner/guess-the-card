@@ -1,8 +1,8 @@
 /* ---------- Theme ---------- */
 :root {
-  --felt-1: #14543d;
-  --felt-2: #0d3527;
-  --felt-3: #082018;
+  --felt-1: #143254;
+  --felt-2: #0d2035;
+  --felt-3: #081320;
   --card-bg: #fcfcf8;
   --red: #c62636;
   --black: #17171a;
@@ -11,12 +11,12 @@
   --gold-ink: #3a2d05;
   /* --gold-1 as channels, for the rgba() tints on the card back. */
   --gold-rgb: 240, 201, 104;
-  --ink: #eef4f0;
-  /* Card back greens: lighter than the felt so the card reads as an object on
+  --ink: #eef1f4;
+  /* Card back blues: lighter than the felt so the card reads as an object on
      the table rather than a hole in it. */
-  --back-1: #1a6b4e;
-  --back-2: #0f4d38;
-  --back-3: #0b3a2a;
+  --back-1: #1a406b;
+  --back-2: #0f2c4d;
+  --back-3: #0b213a;
 }
 
 * { box-sizing: border-box; }
@@ -182,7 +182,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.6px;
   font-size: clamp(14px, 3.6vw, 18px);
-  color: #e7efe9;
+  color: #e7ebef;
   background: rgba(0, 0, 0, 0.24);
   padding: 6px 15px;
   border-radius: 999px;
@@ -305,7 +305,7 @@ button {
   transform: translate(-50%, -50%);
   padding: 4cqh 7cqw;
   border-radius: 3cqw;
-  background: rgba(9, 46, 34, 0.94);
+  background: rgba(9, 26, 46, 0.94);
   border: 0.6cqw solid rgba(var(--gold-rgb), 0.75);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
   color: var(--gold-1);
@@ -360,7 +360,7 @@ button {
   padding: 28px 24px 24px;
   text-align: center;
   border-radius: 18px;
-  background: #12281f;
+  background: #121c28;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
   animation: pop 0.22s ease;
