@@ -9,7 +9,14 @@
   --gold-1: #f0c968;
   --gold-2: #e0b24e;
   --gold-ink: #3a2d05;
+  /* --gold-1 as channels, for the rgba() tints on the card back. */
+  --gold-rgb: 240, 201, 104;
   --ink: #eef4f0;
+  /* Card back greens: lighter than the felt so the card reads as an object on
+     the table rather than a hole in it. */
+  --back-1: #1a6b4e;
+  --back-2: #0f4d38;
+  --back-3: #0b3a2a;
 }
 
 * { box-sizing: border-box; }
@@ -73,6 +80,17 @@ button {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
+
+/* Shared stroke styling for the control-bar icons, so each inline SVG only
+   carries its own geometry. */
+.controls svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn svg { stroke-width: 2; }
 
 .icon-btn {
   width: 42px;
@@ -169,7 +187,7 @@ button {
   padding: 6px 15px;
   border-radius: 999px;
 }
-.progress.hidden { display: none; }
+.progress.is-hidden { display: none; }
 
 .hint {
   font-size: 12px;
@@ -207,7 +225,6 @@ button {
     0 12px 34px rgba(0, 0, 0, 0.38),
     inset 0 0 0 1px rgba(0, 0, 0, 0.07);
   overflow: hidden;
-  transform-origin: center center;
   will-change: transform, opacity;
   animation: cardIn 280ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
@@ -270,16 +287,16 @@ button {
 
 /* Card back (face-down) */
 .card-back {
-  background: radial-gradient(120% 120% at 50% 0%, #1a6b4e 0%, #0f4d38 60%, #0b3a2a 100%);
+  background: radial-gradient(120% 120% at 50% 0%, var(--back-1) 0%, var(--back-2) 60%, var(--back-3) 100%);
 }
 .back-pattern {
   position: absolute;
   inset: 4.5cqw;
   border-radius: 3cqw;
-  border: 0.7cqw solid rgba(240, 201, 104, 0.6);
+  border: 0.7cqw solid rgba(var(--gold-rgb), 0.6);
   background-image:
-    repeating-linear-gradient(45deg,  rgba(240, 201, 104, 0.16) 0 1.5px, transparent 1.5px 10px),
-    repeating-linear-gradient(-45deg, rgba(240, 201, 104, 0.16) 0 1.5px, transparent 1.5px 10px);
+    repeating-linear-gradient(45deg,  rgba(var(--gold-rgb), 0.16) 0 1.5px, transparent 1.5px 10px),
+    repeating-linear-gradient(-45deg, rgba(var(--gold-rgb), 0.16) 0 1.5px, transparent 1.5px 10px);
 }
 .back-plaque {
   position: absolute;
@@ -289,7 +306,7 @@ button {
   padding: 4cqh 7cqw;
   border-radius: 3cqw;
   background: rgba(9, 46, 34, 0.94);
-  border: 0.6cqw solid rgba(240, 201, 104, 0.75);
+  border: 0.6cqw solid rgba(var(--gold-rgb), 0.75);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
   color: var(--gold-1);
   font-family: Georgia, "Times New Roman", serif;
@@ -305,7 +322,7 @@ button {
   right: 0;
   bottom: 7cqw;
   text-align: center;
-  color: rgba(240, 201, 104, 0.8);
+  color: rgba(var(--gold-rgb), 0.8);
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
   font-size: 4cqh;
@@ -324,14 +341,13 @@ button {
   background: rgba(0, 0, 0, 0.55);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
-  opacity: 1;
   /* Opening: visibility flips in at once, so the modal is focusable right away. */
   transition: opacity 0.2s ease, visibility 0s;
 }
 /* visibility, not just opacity: a transparent overlay would otherwise keep the
    modal buttons in the tab order and the accessibility tree. Closing delays it
    by the fade duration so the overlay stays painted while it fades out. */
-.overlay.hidden {
+.overlay.is-closed {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

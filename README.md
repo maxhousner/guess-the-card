@@ -6,11 +6,12 @@ A lightweight, static web app for flipping through a shuffled deck of cards with
 
 ## How to play
 
-- The 52-card deck is shuffled on page load.
+- The 52-card deck is shuffled on page load and starts face down.
 - One large card is shown at a time. **Tap, click, swipe, or press Space / arrow keys** to advance.
 - A `12 / 52` counter tracks your position (toggle it with the eye button).
-- When the deck is finished, choose **Shuffle** for a new order or **Continue in same order** to run through the same pass again.
+- When the deck is finished, choose **Shuffle** for a new order or **Continue in same order** to run through the same pass again. **Esc** does the latter.
 - The **Shuffle** button at the top reshuffles and restarts at any time.
+- **Hard Mode** reshuffles on every card: instead of one pass through the deck, each tap draws at random from the full 52, so cards can repeat and the run never ends. The counter switches to a running tally of cards drawn.
 
 ## Development
 

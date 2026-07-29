@@ -111,10 +111,11 @@
   }
 
   /* ---------- SVG icons ---------- */
+  // Stroke styling lives in CSS (.controls svg); these carry geometry only.
   var EYE =
-    '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    '<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
   var EYE_OFF =
-    '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    '<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
   /* ---------- State ---------- */
   var order = shuffle(buildDeck());
@@ -211,13 +212,13 @@
     overlayTextEl.textContent = 'You’ve gone through all ' + order.length + ' cards.';
     topbarEl.inert = true;
     stageEl.inert = true;
-    overlayEl.classList.remove('hidden');
+    overlayEl.classList.remove('is-closed');
     requestAnimationFrame(function () { reshuffleBtn.focus(); });
   }
   function closeOverlay() {
     var wasOpen = overlayOpen;
     overlayOpen = false;
-    overlayEl.classList.add('hidden');
+    overlayEl.classList.add('is-closed');
     topbarEl.inert = false;
     stageEl.inert = false;
     // Only pull focus back if it was actually inside the modal.
@@ -229,7 +230,7 @@
     closeOverlay();
     dismissHint();
     index = 0;
-    if (hardMode) hardCount = 0;
+    hardCount = 0;
     showBack();
   }
 
@@ -239,30 +240,24 @@
     showCard(order[index]);
   }
 
+  // Either direction starts a fresh run with the first card face down; leaving
+  // Hard Mode also deals a newly shuffled pass.
   function setHardMode(on) {
     hardMode = on;
     toggleHardBtn.setAttribute('aria-pressed', String(on));
     closeOverlay();
     dismissHint();
-    if (on) {
-      // Start a fresh Hard Mode run, first card face down.
-      hardCount = 0;
-      showBack();
-    } else {
-      // Back to a normal shuffled pass, first card face down.
+    hardCount = 0;
+    if (!on) {
       shuffle(order);
       index = 0;
-      showBack();
     }
-  }
-
-  function toggleHard() {
-    setHardMode(!hardMode);
+    showBack();
   }
 
   function toggleProgress() {
     progressOn = !progressOn;
-    progressEl.classList.toggle('hidden', !progressOn);
+    progressEl.classList.toggle('is-hidden', !progressOn);
     toggleBtn.setAttribute('aria-pressed', String(progressOn));
     toggleBtn.innerHTML = progressOn ? EYE : EYE_OFF;
   }
@@ -314,7 +309,7 @@
   /* ---------- Button wiring ---------- */
   shuffleTopBtn.addEventListener('click', reshuffle);
   toggleBtn.addEventListener('click', toggleProgress);
-  toggleHardBtn.addEventListener('click', toggleHard);
+  toggleHardBtn.addEventListener('click', function () { setHardMode(!hardMode); });
   reshuffleBtn.addEventListener('click', reshuffle);
   continueBtn.addEventListener('click', continueSame);
 
