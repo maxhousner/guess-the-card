@@ -98,8 +98,7 @@
   }
 
   // Decorative face-down back shown at the start of a freshly shuffled deck.
-  // Reuses .card-face so it inherits the card's size, radius, shadow and
-  // cardIn reveal animation.
+  // Reuses .card-face so it inherits the card's size, radius and shadow.
   function cardBackHTML() {
     return (
       '<div class="card-face card-back">' +
@@ -140,6 +139,48 @@
   var overlayTextEl = document.getElementById('overlayText');
   var topbarEl = document.querySelector('.topbar');
   var stageEl = document.querySelector('.stage');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* ---------- Card transitions ---------- */
+  // The face on top of the pile. Older faces linger underneath only until
+  // their replacement's animation finishes.
+  var currentFace = null;
+
+  function makeFace(html) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.firstChild;
+  }
+
+  // Deal on: the new face slides in from the right and settles on top of the
+  // old one, which is removed once covered.
+  function dealIn(html) {
+    var old = currentFace;
+    currentFace = makeFace(html);
+    if (reduceMotion.matches) { cardEl.replaceChildren(currentFace); return; }
+    cardEl.appendChild(currentFace);
+    currentFace.animate([
+      { transform: 'translate(70%, -4%) rotate(9deg)', opacity: 0 },
+      { opacity: 1, offset: 0.35 },
+      { transform: 'none', opacity: 1 }
+    ], { duration: 380, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }).onfinish = function () {
+      if (old) old.remove();
+    };
+  }
+
+  // 3D flip: the old face turns edge-on, then the new face turns in from the
+  // other edge. The new face is added right away but held edge-on (invisible)
+  // by the delay, so nothing has to be chained if another change comes mid-flip.
+  function flipTo(html) {
+    var old = currentFace;
+    currentFace = makeFace(html);
+    if (reduceMotion.matches) { cardEl.replaceChildren(currentFace); return; }
+    cardEl.appendChild(currentFace);
+    old.animate([{ transform: 'none' }, { transform: 'rotateY(90deg) scale(1.04)' }],
+      { duration: 150, easing: 'ease-in', fill: 'forwards' }).onfinish = function () { old.remove(); };
+    currentFace.animate([{ transform: 'rotateY(-90deg) scale(1.04)' }, { transform: 'none' }],
+      { duration: 220, delay: 150, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'backwards' });
+  }
 
   /* ---------- Core actions ---------- */
   function drawHardCard() {
@@ -156,9 +197,11 @@
     }
   }
 
+  // Revealing the face-down back flips it over; every other change deals on.
   function showCard(card) {
+    var reveal = faceDown;
     faceDown = false;
-    cardEl.innerHTML = cardFaceHTML(card);
+    (reveal ? flipTo : dealIn)(cardFaceHTML(card));
     cardEl.setAttribute('aria-label', cardName(card) + '. Tap or press space for the next card.');
     updateProgress();
   }
@@ -167,7 +210,7 @@
   // reveals it rather than moving on.
   function showBack() {
     faceDown = true;
-    cardEl.innerHTML = cardBackHTML();
+    dealIn(cardBackHTML());
     cardEl.setAttribute('aria-label', 'Card face down. Tap or press space to reveal the first card.');
     updateProgress();
   }
