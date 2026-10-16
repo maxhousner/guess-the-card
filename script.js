@@ -125,6 +125,7 @@
   var faceDown = false;
   var hardMode = false;
   var hardCount = 0;
+  var bowTimer = null;
 
   /* ---------- Elements ---------- */
   var cardEl = document.getElementById('card');
@@ -248,6 +249,8 @@
     showCard(order[index]);
   }
 
+  // The deck has won: the last card flips face down and takes a bow (.card.bow
+  // in style.css), then the message fades in beneath it.
   // aria-modal promises the rest of the page is out of reach, so make it so:
   // inert the page behind the modal, move focus in, and hand it back on close.
   function openOverlay() {
@@ -255,12 +258,18 @@
     overlayTextEl.textContent = 'You’ve gone through all ' + order.length + ' cards.';
     topbarEl.inert = true;
     stageEl.inert = true;
-    overlayEl.classList.remove('is-closed');
-    requestAnimationFrame(function () { reshuffleBtn.focus(); });
+    flipTo(cardBackHTML());
+    cardEl.classList.add('bow');
+    bowTimer = setTimeout(function () {
+      overlayEl.classList.remove('is-closed');
+      requestAnimationFrame(function () { reshuffleBtn.focus(); });
+    }, reduceMotion.matches ? 0 : 1900);
   }
   function closeOverlay() {
     var wasOpen = overlayOpen;
     overlayOpen = false;
+    clearTimeout(bowTimer);
+    cardEl.classList.remove('bow');
     overlayEl.classList.add('is-closed');
     topbarEl.inert = false;
     stageEl.inert = false;
